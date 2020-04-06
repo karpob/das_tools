@@ -6,7 +6,6 @@ import math
 import numpy as np
 import numpy.ma as ma
 import matplotlib.pyplot as plt
-import colormaps
 import matplotlib.cm as mcm
 from matplotlib.collections import PatchCollection
 from matplotlib.patches import Rectangle
@@ -35,8 +34,8 @@ class plotter_2d:
     def plotter_2d(self,\
                     startdate=2018080100,\
                     enddate=2018093000,\
-                    expid1='bmk_dR2s.21z',\
-                    expid2='bmk_ana.21z',\
+                    expid1='bmk_o4_nf.21z',\
+                    expid2='bmk_ctl_joff.21z',\
                     expid1_name='9.6 $\mu$m',\
                     expid2_name='control',\
                     variables=['h','t','u','v','q'],\
@@ -213,9 +212,9 @@ class plotter_1d:
     def plotter_1d(self,\
                     startdate=2018080100,\
                     enddate=2018093000,\
-                    exp_ids=['bmk_dR2s.21z','bmk_o4_nf.21z'],\
-                    control='bmk_ana.21z',\
-                    exp_names=['9.6 $\mu$m Correlated Error','9.6 $\mu$m Initial'],\
+                    exp_ids=['bmk_o4_nf.21z'],\
+                    control='bmk_ctl_joff.21z',\
+                    exp_names=['9.6 $\mu$m'],\
                     control_name='Control',\
                     variables=['h','t','u','v','q'],\
                     domains=['n.hem','s.hem','tropics'],\
@@ -232,7 +231,7 @@ class plotter_1d:
                     ncol = 3,\
                     graphicOutput='.png'):
         """
-        Main Plotter for 1dwhich will loop through various variables and domains. For each variable and domain
+        Main Plotter for 1d which will loop through various variables and domains. For each variable and domain
         """
         if levs is None:
             levs=np.array([1000.0,850.0,700.0,500.0,400.0,300.0,250.0,200.0,150.0,100.0])
