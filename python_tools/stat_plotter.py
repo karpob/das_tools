@@ -1,17 +1,14 @@
-
-import matplotlib
-matplotlib.use('Agg')
-import psycopg2
-import math
+import sys, math
 import numpy as np
-import numpy.ma as ma
 import matplotlib.pyplot as plt
-import matplotlib.cm as mcm
 from matplotlib.collections import PatchCollection
 from matplotlib.patches import Rectangle
+
+# python_tools libraries.
 import ac_significance as ac_sig
-from fcst_stat_database_access import experiment as fcst_db
-import sys
+from fcst_stat_database_access import experiment as fcst_db  # <-- psycopg2 is loaded here.
+
+# dictionaries used to translation to longer names in plots
 var2Name = {}
 var2Name['h'] = 'Height'
 var2Name['t'] = 'Temperature'
@@ -32,12 +29,12 @@ class plotter_2d:
     
    
     def plotter_2d(self,\
-                    startdate=2018080100,\
-                    enddate=2018093000,\
-                    expid1='bmk_o4_nf.21z',\
-                    expid2='bmk_ctl_joff.21z',\
-                    expid1_name='9.6 $\mu$m',\
-                    expid2_name='control',\
+                    startdate=2019120100,\
+                    enddate=2020012900,\
+                    expid1='x0041.21z',\
+                    expid2='x0039_p5.21z',\
+                    expid1_name='x0041',\
+                    expid2_name='x0039_p5',\
                     variables=['h','t','u','v','q'],\
                     domains=['n.hem','s.hem','tropics'],\
                     sigplot=True,\
@@ -210,12 +207,12 @@ class plotter_2d:
 
 class plotter_1d:
     def plotter_1d(self,\
-                    startdate=2018080100,\
-                    enddate=2018093000,\
-                    exp_ids=['bmk_o4_nf.21z'],\
-                    control='bmk_ctl_joff.21z',\
-                    exp_names=['9.6 $\mu$m'],\
-                    control_name='Control',\
+                    startdate=2019120100,\
+                    enddate=2020012900,\
+                    exp_ids=['x0041.21z'],\
+                    control='x0039_p5.21z',\
+                    exp_names=['x0041'],\
+                    control_name='x0039_p5',\
                     variables=['h','t','u','v','q'],\
                     domains=['n.hem','s.hem','tropics'],\
                     verbose=False,\
@@ -440,9 +437,10 @@ class plotter_1d:
         return(artists)
 
 if __name__ == "__main__":
-    #a = plotter_2d()
-    #a.plotter_2d()
-    #a.plotter_2d(statistic='rms')
+    a = plotter_2d()
+
+    a.plotter_2d()
+    a.plotter_2d(statistic='rms')
 
     a = plotter_1d()
     a.plotter_1d()
