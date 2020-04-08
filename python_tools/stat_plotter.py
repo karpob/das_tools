@@ -193,7 +193,7 @@ class plotter_2d:
         if (statistic =='cor'):
             outtitle = "Anomaly Correlation {} Difference {}\n{} minus {}\n{} - {}, {} Forecasts".format(var2Name[var], dom2Long[dom],self.expid1_name, self.expid2_name, startdate_fmt, enddate_fmt, n)
         elif(statistic =='rms'):
-            outtitle = "RMSE {} Difference {}\n{} minus {}\n{} - {}, {} Forecasts".format(var2Name[var], dom2Long[dom], self.expid1_name, self.expid2_name, startdate_fmt, enddate_fmt, dom2Long[dom], n) 
+            outtitle = "RMSE {} Difference {}\n{} minus {}\n{} - {}, {} Forecasts".format(var2Name[var], dom2Long[dom], self.expid1_name, self.expid2_name, startdate_fmt, enddate_fmt, n) 
         plt.title(outtitle, fontsize=10)
         if (self.sigplot):
             self.ac.oplot_sig_hatch(ax, self.sigarr, pltsteps, pltlevs)
