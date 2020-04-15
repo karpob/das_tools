@@ -3,6 +3,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.collections import PatchCollection
 from matplotlib.patches import Rectangle
+import matplotlib.ticker                         # here's where the formatter is
+cbformat = matplotlib.ticker.ScalarFormatter()   # create the formatter
+cbformat.set_powerlimits((-3,3))                 # set the limits for sci. not.
 
 # python_tools libraries.
 import ac_significance as ac_sig
@@ -15,6 +18,14 @@ var2Name['t'] = 'Temperature'
 var2Name['q'] = 'Specific Humidity'
 var2Name['u'] = 'U Wind'
 var2Name['v'] = 'V Wind'
+
+var2Unit = {}
+var2Unit['h'] = 'meters'
+var2Unit['t'] = 'Kelvin'
+var2Unit['q'] = 'kg/kg'
+var2Unit['u'] = 'm/s'
+var2Unit['v'] = 'm/s'
+
 dom2Long = {}
 dom2Long['s.hem'] = 'Southern Hemisphere'
 dom2Long['n.hem'] = 'Northern Hemisphere'
@@ -23,7 +34,9 @@ dom2Long['global'] = 'Global'
 stat2Long ={}
 stat2Long['cor'] = 'Anomaly Correlation'
 stat2Long['rms'] = 'Root Mean Squared Error'
+stat2Long['rms_bar'] = 'Root Mean Squared Error Bias'
 
+toPPMV = (28.97/18.)*1.0e6
 
 class plotter_2d:
     
@@ -50,11 +63,15 @@ class plotter_2d:
                     levs=None,\
                     zero_t_zero=True,\
                     statistic='cor',\
+                    ppmv_switch=False,\
+                    title_fontsize=10,\
                     graphicOutput='.png'):
         """
         Main Plotter which will loop through various variables and domains. For each variable and domain
         it will produce a 2D (3D if you count color) pcolor plot of the difference between the forecasts (expid1 minus expid2).
         """
+        self.title_fontsize = title_fontsize
+        self.ppmv_switch = ppmv_switch
         if levs is None:
             levs=np.array([1000.0,850.0,700.0,500.0,400.0,300.0,250.0,200.0,150.0,100.0])
         else:
@@ -157,6 +174,12 @@ class plotter_2d:
 
         plt.subplots_adjust(top=0.85, left=0.18)
         if (self.zero_t_zero): self.corarr[0,:] = 0.0
+
+        if(self.ppmv_switch and var=='q' and statistic=='rms'):
+            self.corarr= toPPMV*self.corarr
+            var2Unit[var]='ppmv'
+
+
         mx = np.max(self.corarr)
         mn = np.min(self.corarr)
         rng = max( ( np.abs(mx), np.abs(mn) ) )
@@ -165,6 +188,7 @@ class plotter_2d:
             cm = 'PiYG'
         else:
             cm = 'PiYG_r'
+               
         fg = plt.pcolor(self.stps2d, self.levs2d, self.corarr, cmap = cm, vmin = rng*-1.0, vmax = rng)
         
         plt.xlim([0 - 6,120 + 6])
@@ -188,17 +212,21 @@ class plotter_2d:
         startdate_fmt = sd[0:4]+'.'+sd[4:6]+'.'+sd[6:8]+' '+sd[8:10]+' UTC' 
         enddate_fmt = ed[0:4]+'.'+ed[4:6]+'.'+ed[6:8]+' '+ed[8:10]+' UTC'
         startdate,enddate = sd,ed
- 
 
         if (statistic =='cor'):
             outtitle = "Anomaly Correlation {} Difference {}\n{} minus {}\n{} - {}, {} Forecasts".format(var2Name[var], dom2Long[dom],self.expid1_name, self.expid2_name, startdate_fmt, enddate_fmt, n)
         elif(statistic =='rms'):
             outtitle = "RMSE {} Difference {}\n{} minus {}\n{} - {}, {} Forecasts".format(var2Name[var], dom2Long[dom], self.expid1_name, self.expid2_name, startdate_fmt, enddate_fmt, n) 
-        plt.title(outtitle, fontsize=10)
+
+        elif(statistic =='rms_bar'):
+            outtitle = "RMSE Bias {} Difference {}\n{} minus {}\n{} - {}, {} Forecasts".format(var2Name[var], dom2Long[dom], self.expid1_name, self.expid2_name, startdate_fmt, enddate_fmt, n) 
+
+        plt.title(outtitle, fontsize=self.title_fontsize)
         if (self.sigplot):
             self.ac.oplot_sig_hatch(ax, self.sigarr, pltsteps, pltlevs)
-        cbar= plt.colorbar()
-        cbar.set_label('Difference')
+        cbar= plt.colorbar(format=cbformat,pad=0.1)
+        if(statistic=='cor'):cbar.set_label('Difference ' )
+        else:cbar.set_label('Difference [{}] '.format(var2Unit[var]) )
         fn = '{}_z.{}.{}-{}.{}-{}.{}.verif-{}.{}'.format(statistic, var, expid1, expid2, startdate, enddate, dom, verif1, verif2)
         print('Writing: ',fn + self.graphicOutput) 
         fig.savefig(fn + self.graphicOutput)
@@ -402,6 +430,8 @@ class plotter_1d:
             outtitle = "{} hPa Anomaly Correlation {} {}\n{} - {}, {} Forecasts".format(lev, var2Name[var], dom2Long[dom], startdate_fmt, enddate_fmt, n)
         elif(statistic =='rms'):
             outtitle = "{} hPa RMSE {} {}\n{} - {}, {} Forecasts".format(lev, var2Name[var], dom2Long[dom], startdate_fmt, enddate_fmt, n) 
+        elif(statistic == 'rms_bar'):
+            outtitle = "{} hPa RMSE Bias {} {}\n{} - {}, {} Forecasts".format(lev, var2Name[var], dom2Long[dom], startdate_fmt, enddate_fmt, n) 
         plt.suptitle(outtitle, fontsize=10)
         # done making fancy title.
 
